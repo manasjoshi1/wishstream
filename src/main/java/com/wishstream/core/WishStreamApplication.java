@@ -1,4 +1,4 @@
-package com.wishstream.core.config;
+package com.wishstream.core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
