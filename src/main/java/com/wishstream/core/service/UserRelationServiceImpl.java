@@ -347,26 +347,30 @@ public class UserRelationServiceImpl implements UserService {
         private ComprehensiveEventDTO mapToComprehensiveEventDTO(Object[] row) {
             ComprehensiveEventDTO dto = new ComprehensiveEventDTO();
 
-            dto.setUserId((String) row[1]);
-            dto.setUserEmail((String) row[2]);
-            dto.setUserFirstName((String) row[3]);
-            dto.setUserLastName((String) row[4]);
-            dto.setUserPhone((String) row[5]);
-            dto.setUserPhoneExtension((String) row[6]);
-            dto.setUserRelationId((String) row[7]);
-            dto.setRelationFirstName((String) row[8]);
-            dto.setRelationLastName((String) row[9]);
-            dto.setRelation((String) row[10]);
-            dto.setRelationType((String) row[11]);
-            dto.setRelationEmail((String) row[12]);
-            dto.setRelationPhone((String) row[13]);
-            dto.setRelationPhoneExtension((String) row[14]);
-            dto.setTimezone((String) row[15]);
-//            dto.setEventId(Long.parseLong((String) row[i++]));
-            dto.setEventName((String) row[17]);
-//            dto.setEventDateUtc((LocalDateTime) row[i++]);
-            dto.setNotes((String) row[19]);
-//            dto.setStatus((String) row[19]);
+            if (row[1] != null) dto.setUserId((String) row[1]);
+            if (row[2] != null) dto.setUserEmail((String) row[2]);
+            if (row[3] != null) dto.setUserFirstName((String) row[3]);
+            if (row[4] != null) dto.setUserLastName((String) row[4]);
+            if (row[5] != null) dto.setUserPhone((String) row[5]);
+            if (row[6] != null) dto.setUserPhoneExtension((String) row[6]);
+            if (row[7] != null) dto.setUserRelationId((String) row[7]);
+            if (row[8] != null) dto.setRelationFirstName((String) row[8]);
+            if (row[9] != null) dto.setRelationLastName((String) row[9]);
+            if (row[10] != null) dto.setRelation((String) row[10]);
+            if (row[11] != null) dto.setRelationType((String) row[11]);
+            if (row[12] != null) dto.setRelationEmail((String) row[12]);
+            if (row[13] != null) dto.setRelationPhone((String) row[13]);
+            if (row[14] != null) dto.setRelationPhoneExtension((String) row[14]);
+            if (row[15] != null) dto.setTimezone((String) row[15]);
+            if (row[17] != null) dto.setEventName((String) row[17]);
+            if (row[19] != null) dto.setNotes((String) row[19]);
+            if (row[20] != null) dto.setStatus((String) row[20]);
+            if (row[21] != null) dto.setMessageOnPhone((String) row[21]);
+            if (row[22] != null) dto.setSubject((String) row[22]);
+            if (row[23] != null) dto.setBody((String) row[23]);
+
+
+
             return dto;
         }
 
