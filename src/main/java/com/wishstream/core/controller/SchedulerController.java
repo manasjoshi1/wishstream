@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -31,7 +32,10 @@ public class SchedulerController {
 
     @PostMapping("/process-events-with-gpt")
     public ResponseEntity<String> triggerGPTEventProcessing() {
-        CompletableFuture.runAsync(() -> batchEventProcessor.processEventsWithGPT());
+        CompletableFuture.runAsync(() -> {
+                batchEventProcessor.processEventsWithGPT();
+
+        });
         return ResponseEntity.ok("Processing of events with GPT has been triggered.");
     }
 
