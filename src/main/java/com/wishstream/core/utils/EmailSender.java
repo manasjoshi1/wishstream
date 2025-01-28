@@ -1,61 +1,56 @@
-package org.mailtrap;
+package com.wishstream.core.utils;
 
-import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
+import com.wishstream.core.dto.ComprehensiveEventDTO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.util.Properties;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
-public class Main {
-    public static void main(String[] args) {
+@Slf4j
+@Component
+public class EmailSender {
+    @Value("${mailtrap.api.url}")
+    private String mailtrapApiUrl;
 
-        // provide recipient's email ID
-        String to = "your.recipient@email.com";
-        // provide sender's email ID
-        String from = "john.doe@your.domain";
+    @Value("${mailtrap.api.token}")
+    private String mailtrapApiToken;
 
-        // provide Mailtrap's username
-        final String username = "api";
-        final String password = "9c8aee72e7e4ebdd64b57bf2df163e1e";
 
-        // provide Mailtrap's host address
-        String host = "live.smtp.mailtrap.io";
-
-        // configure Mailtrap's SMTP details
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", "587");
-
-        // create the Session object
-        Session session = Session.getInstance(props,
-                new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(username, password);
-                    }
-                });
-
+    public  void sendEmail(ComprehensiveEventDTO eventDTO)  {
         try {
-            // create a MimeMessage object
-            Message message = new MimeMessage(session);
-            // set From email field
-            message.setFrom(new InternetAddress(from));
-            // set To email field
-            message.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            // set email subject field
-            message.setSubject("Hello from the Mailtrap team");
-            // set the content of the email message
-            message.setText("Enjoy sending emails from Jakarta Mail!");
 
-            // send the email message
-            Transport.send(message);
 
-            System.out.println("Email Message Sent Successfully!");
+            StringBuilder jsonBody = new StringBuilder();
+            jsonBody.append("{");
+            jsonBody.append("\"to\":[{\"email\":\"").append("raghavsphadke@gmail.com").append("\",\"name\":\"")
+                    .append(eventDTO.getRelationFirstName()).append(" ").append(eventDTO.getRelationLastName()).append("\"}],");
+            jsonBody.append("\"from\":{\"email\":\"").append(eventDTO.getUserEmail()).append("\",\"name\":\"").append(eventDTO.getUserFirstName()).append("\"},");
+            jsonBody.append("\"reply_to\":{\"email\":\"").append(eventDTO.getUserEmail()).append("\",\"name\":\"").append(eventDTO.getUserFirstName()).append("\"},");
 
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            jsonBody.append("\"subject\":\"").append(eventDTO.getSubject()).append("\",");
+
+            jsonBody.append("\"text\":\"").append(eventDTO.getBody().replace("\"", "\\\"").replace("\n", "\\n")).append("\"");
+            jsonBody.append("}");
+            System.out.println(jsonBody.toString());
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(mailtrapApiUrl))
+                    .header("Accept", "application/json")
+                    .header("Authorization","Bearer " +mailtrapApiToken)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody.toString()))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            log.info("Status code: " + response.statusCode());
+            log.info("Response body: " + response.body());
+        } catch (Exception e) {
+            log.error(" Error  : {}",e);
         }
     }
 }
