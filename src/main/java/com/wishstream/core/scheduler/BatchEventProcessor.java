@@ -3,6 +3,7 @@ package com.wishstream.core.scheduler;
 import com.wishstream.core.dto.ComprehensiveEventDTO;
 import com.wishstream.core.service.GPTService;
 import com.wishstream.core.service.UserRelationServiceImpl;
+import com.wishstream.core.utils.EmailSender;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
 
 @Component
 public class BatchEventProcessor {
@@ -25,6 +28,9 @@ public class BatchEventProcessor {
 
     @Autowired
     private UserRelationServiceImpl userRelationService;
+
+    @Autowired
+    private EmailSender emailSender;
 
     private Logger log = LoggerFactory.getLogger(BatchEventProcessor.class);
 
@@ -48,15 +54,15 @@ public class BatchEventProcessor {
     }
 
         @Scheduled(cron = "0 0 2 * * *", zone = "UTC")
-        public void processEventsWithGPT() {
+        public void processEventsWithGPT()  {
             LocalDate tomorrow = LocalDate.now().plusDays(1);
             String tableName = "events_" + tomorrow.format(DateTimeFormatter.ofPattern("yyyy_MM_dd"));
 
             // Fetch stored events
             List<ComprehensiveEventDTO> events = userRelationService.fetchComprehensiveEvents(tableName);
+            log.info("Processing prompts for  {} events for {}", events.size(), tomorrow);
 
-
-            // Process each event with GPT
+//             Process each event with GPT
             for (ComprehensiveEventDTO event : events) {
                 ComprehensiveEventDTO updatedDTO = gptService.generateEmailDetails(event);
                 userRelationService.updateComprehensiveEvent(updatedDTO,tableName);
@@ -65,5 +71,21 @@ public class BatchEventProcessor {
             log.info("Processed {} events for {}", events.size(), tomorrow);
         }
 
+    @Scheduled(cron = "0 0 6 * * *", zone = "UTC")
+    public void sendEmails()  {
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        String tableName = "events_" + tomorrow.format(DateTimeFormatter.ofPattern("yyyy_MM_dd"));
+
+        // Fetch stored events
+        List<ComprehensiveEventDTO> events = userRelationService.fetchComprehensiveEvents(tableName);
+        log.info("Sending Emails for  {} events for {}", events.size(), tomorrow);
+
+//       Process each event with GPT
+        for (ComprehensiveEventDTO event : events) {
+            emailSender.sendEmail(event);
+        }
+
+        log.info("Processed {} events for {}", events.size(), tomorrow);
+    }
     }
 
