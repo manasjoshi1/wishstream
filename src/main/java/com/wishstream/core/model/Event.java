@@ -1,28 +1,80 @@
 package com.wishstream.core.model;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+@Entity
+@Table(name = "events")
+@Getter
+@Setter
 public class Event {
 
-    private String date;
-    private String event;
-    private String notes;
-    private String recurrence;
-    private String type; // For "update/new"
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public Event(String event, String eventDate, String notes, String recurrence) {
+    @Column(name = "user_relation_id", nullable = false)
+    private String userRelationId;
+
+    @Column(name = "event_name", nullable = false)
+    private String event;
+
+    @Column(name = "event_date_utc", nullable = false)
+    private LocalDateTime eventDateUtc;
+
+    @Column(name = "timezone", nullable = false)
+    private String timezone;
+
+    @Column(name = "local_event_time", nullable = false)
+    private LocalDateTime localEventTime;
+
+    @Column(name = "recurrence", nullable = false)
+    private String recurrence; // none, daily, weekly, monthly, yearly
+
+    @Column(name = "type", nullable = false)
+    private String type; // new, update
+
+    @Column(name = "notes")
+    private String notes;
+
+    /**
+     * Converts the given local date & time to UTC for storage.
+     */
+    public void setEventDateInUtc(LocalDateTime localDate, String timezone) {
+        ZonedDateTime localZdt = ZonedDateTime.of(localDate, ZoneId.of(timezone));
+        this.eventDateUtc = localZdt.withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime();
+        this.timezone = timezone;
+        this.localEventTime = localDate;
     }
 
-    public Event() {
-
+    /**
+     * Converts stored UTC event time back to user's local time.
+     */
+    public LocalDateTime getEventDateInLocalTime() {
+        return eventDateUtc.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of(timezone)).toLocalDateTime();
     }
 
     // Getters and Setters
 
-    public String getDate() {
-        return date;
+    public Long getId() {
+        return id;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUserRelationId() {
+        return userRelationId;
+    }
+
+    public void setUserRelationId(String userRelationId) {
+        this.userRelationId = userRelationId;
     }
 
     public String getEvent() {
@@ -33,12 +85,28 @@ public class Event {
         this.event = event;
     }
 
-    public String getNotes() {
-        return notes;
+    public LocalDateTime getEventDateUtc() {
+        return eventDateUtc;
     }
 
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setEventDateUtc(LocalDateTime eventDateUtc) {
+        this.eventDateUtc = eventDateUtc;
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+
+    public LocalDateTime getLocalEventTime() {
+        return localEventTime;
+    }
+
+    public void setLocalEventTime(LocalDateTime localEventTime) {
+        this.localEventTime = localEventTime;
     }
 
     public String getRecurrence() {
@@ -55,5 +123,13 @@ public class Event {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

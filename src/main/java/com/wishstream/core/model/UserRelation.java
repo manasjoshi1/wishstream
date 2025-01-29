@@ -13,7 +13,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @Document(collection = "user_relations") // MongoDB collection name
 public class UserRelation {
@@ -42,22 +41,28 @@ public class UserRelation {
     @Field("phone_extension")
     private String phoneExtension;
 
-    @Field("ws_txn_id")
-    private String wsTxnId;
-
     @Field("user_relation_id")
     private String userRelationId;
 
     @Field("events")
     private List<Event> events;
 
-    @Field("location")
-    private Location location;
-
-    @Field("timezone")
     private String timezone;
 
     public UserRelation(String relation, String firstName, String lastName, String s, String s1) {
+    }
+    public UserRelation(String firstName, String lastName, String relation, String relationType, String email, String phone, String phoneExtension, String timezone, List<Event> events) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.relation = relation;
+        this.relationType = relationType;
+        this.email = email;
+        this.phone = phone;
+        this.phoneExtension = phoneExtension;
+        this.timezone = timezone;
+        this.events = events;
+    }
+    public UserRelation() {
     }
 
     // Getters and Setters
@@ -126,13 +131,7 @@ public class UserRelation {
         this.phoneExtension = phoneExtension;
     }
 
-    public String getWsTxnId() {
-        return wsTxnId;
-    }
 
-    public void setWsTxnId(String wsTxnId) {
-        this.wsTxnId = wsTxnId;
-    }
 
     public String getUserRelationId() {
         return userRelationId;
@@ -150,13 +149,7 @@ public class UserRelation {
         this.events = events;
     }
 
-    public Location getLocation() {
-        return location;
-    }
 
-    public void setLocation(Location location) {
-        this.location = location;
-    }
 
     public String getTimezone() {
         return timezone;
