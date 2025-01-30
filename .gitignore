@@ -49,3 +49,4 @@ collection-*.wt
 index-*.wt
 sizeStorer.wt
 WiredTiger*
+*.wt
