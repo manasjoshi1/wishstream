@@ -4,13 +4,12 @@ import com.wishstream.core.model.User;
 import com.wishstream.core.model.UserRelation;
 import jakarta.validation.constraints.Email;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
+@Repository
+public interface UserRelationRepo extends MongoRepository<UserRelation,String> {
 
-public interface UserRepo extends MongoRepository<User,String> {
-//    List<UserRelation> findEventsBetweenDates(LocalDate startDate, LocalDate endDate);
+    Optional<UserRelation> findUserRelationByUserRelationId(String userRelationId);
 
-    Optional<User> findByEmailOrPhone(@Email(message = "Invalid email format") String email, String phone);
 }
